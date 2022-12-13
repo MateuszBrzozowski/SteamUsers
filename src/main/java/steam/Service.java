@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static steam.Validator.removeRangersPLTag;
-import static steam.constant.ApiConstant.API_KEY;
-import static steam.constant.ApiConstant.APP_ID_SQUAD;
 
 public class Service {
     private static final String SEPARATOR = "==========================================";
+    private static final String API_KEY = "FB66257EF6A5810F2BDEAE50009F186E";
+    private static final int APP_ID_SQUAD = 393380;
     private HttpURLConnection connection;
     private final List<User> users = new ArrayList<>();
 
