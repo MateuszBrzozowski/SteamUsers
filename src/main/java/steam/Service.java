@@ -16,20 +16,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static steam.Validator.removeRangersPLTag;
+import static steam.constant.ApiConstant.API_KEY;
+import static steam.constant.ApiConstant.APP_ID_SQUAD;
 
 public class Service {
     private static final String SEPARATOR = "==========================================";
-    private static final String API_KEY = "FB66257EF6A5810F2BDEAE50009F186E";
-    private static final int APP_ID = 393380;
     private HttpURLConnection connection;
     private final List<User> users = new ArrayList<>();
 
-    public Service() {
+    /**
+     * Read file "resources.cvs",
+     * Download hours for Users from Steam API,
+     * Save data (userName, hours) to file "usersHours.csv"
+     */
+    public void getUserHoursAndExportToFile() {
         LocalTime timeStart = LocalTime.now();
         try {
             readUsersList();
             System.out.println("[INFO] - Pobieranie godzin");
-            getUsersData();
+            getUsersHours();
             System.out.println("[INFO] - Pobrano godziny");
             System.out.println(SEPARATOR);
             saveDataToFile();
@@ -41,6 +46,11 @@ public class Service {
     }
 
 
+    /**
+     * Reading and create User from file data.
+     * File structure - 4 columns split by ','. Export and delivered from Google Docs.
+     * (tag, name, type, steamId)
+     */
     private void readUsersList() {
         String fileName = "resources.csv";
         System.out.println("[INFO] - Wczytywanie użytkowników z pliku - " + fileName);
@@ -60,6 +70,11 @@ public class Service {
         }
     }
 
+    /**
+     * Create user from file data.
+     *
+     * @param data Line of user data from file.
+     */
     private void addUserFromData(String[] data) {
         if (data != null) {
             String nicknameWithoutTag = removeRangersPLTag(data[1]);
@@ -72,12 +87,15 @@ public class Service {
                 for (String datum : data) {
                     System.out.print(" " + datum);
                 }
-                System.out.print(")\n");
+                System.out.println(")");
             }
         }
     }
 
 
+    /**
+     * Saving user to file "usersHours.csv"
+     */
     private void saveDataToFile() {
         System.out.println("[INFO] - Zapisywanie danych do pliku");
         try {
@@ -95,12 +113,20 @@ public class Service {
     }
 
 
-    private void getUsersData() {
+    /**
+     * Getting hours for all users
+     */
+    private void getUsersHours() {
         for (User user : users) {
             getHoursFromJSON(user);
         }
     }
 
+    /**
+     * Connect with Steam API, download data, setting hours for User
+     *
+     * @param user To which we set data.
+     */
     private void getHoursFromJSON(@NotNull User user) {
         String responseContent = getResponseContent(user);
         if (responseContent == null) {
@@ -115,7 +141,7 @@ public class Service {
             for (int i = 0; i < games.length(); i++) {
                 JSONObject jsonGame = games.getJSONObject(i);
                 int appId = jsonGame.getInt("appid");
-                if (appId == APP_ID) {
+                if (appId == APP_ID_SQUAD) {
                     int playtimeForever = jsonGame.getInt("playtime_forever");
                     user.setPlaytimeForever(playtimeForever);
                 }
@@ -125,6 +151,12 @@ public class Service {
         System.out.println("Pobrano");
     }
 
+    /**
+     * Getting content from steam API for {@link User}
+     *
+     * @param user {@link User} To which we download content.
+     * @return String content from API.
+     */
     private @Nullable String getResponseContent(@NotNull User user) {
         String urlString = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + API_KEY + "&steamid=" + user.getSteamId() + "&format=json";
         StringBuilder responseContent = new StringBuilder();
@@ -156,6 +188,12 @@ public class Service {
         return responseContent.toString();
     }
 
+    /**
+     * Convert String url to instance of {@link URL}
+     *
+     * @param url String of url
+     * @return {@link URL}
+     */
     private URL getUrl(String url) {
         try {
             return new URL(url);
