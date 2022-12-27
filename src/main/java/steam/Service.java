@@ -15,8 +15,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static steam.Validator.removeRangersPLTag;
-
 public class Service {
     private static final String SEPARATOR = "==========================================";
     private static final String API_KEY = "FB66257EF6A5810F2BDEAE50009F186E";
@@ -76,19 +74,17 @@ public class Service {
      * @param data Line of user data from file.
      */
     private void addUserFromData(String[] data) {
-        if (data != null) {
-            String nicknameWithoutTag = removeRangersPLTag(data[1]);
-            String steamId = Validator.isSteamId(data[3]);
-            if (steamId != null) {
-                User user = new User(nicknameWithoutTag, steamId);
-                users.add(user);
-            } else {
-                System.out.print("[WARN] - Pominięta linia - (");
-                for (String datum : data) {
-                    System.out.print(" " + datum);
-                }
-                System.out.println(")");
+        if (data != null && data.length >= 4 && Validator.isSteamId(data[3]) != null) {
+            String nicknameWithoutTag = Modifier.removeRangersPLTag(data[1]);
+            String steamId = data[3];
+            User user = new User(nicknameWithoutTag, steamId);
+            users.add(user);
+        } else {
+            System.out.print("[WARN] - Pominięta linia - (");
+            for (String datum : data) {
+                System.out.print(" " + datum);
             }
+            System.out.println(")");
         }
     }
 
