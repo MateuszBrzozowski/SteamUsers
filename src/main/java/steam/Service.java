@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Service {
     private static final String SEPARATOR = "==========================================";
-    private static final String API_KEY = "FB66257EF6A5810F2BDEAE50009F186E";
+    private static final String API_KEY = "EA530498E96BBAC1B354DA98AB8AB2EC";
     private static final int APP_ID_SQUAD = 393380;
     private HttpURLConnection connection;
     private final List<User> users = new ArrayList<>();
